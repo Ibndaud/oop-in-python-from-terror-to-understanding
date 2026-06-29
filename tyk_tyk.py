@@ -8,6 +8,12 @@ import math
 # ------------------------------------------------------------
 TITLE = "Тык-тык"
 
+BACKGROUND_COLOR = (20, 30, 40)
+TEXT_COLOR = (220, 220, 220)
+SECONDARY_TEXT_COLOR = (200, 200, 200)
+HINT_TEXT_COLOR = (180, 180, 200)
+HELP_TEXT_COLOR = (160, 160, 180)
+
 WIDTH, HEIGHT = 1200, 768
 
 
@@ -45,8 +51,19 @@ class Circle:
         _x, _y = pos
         return (pow(_x - self.x, 2) + pow(_y - self.y, 2)) ** 0.5 <= self.radius
     
+    # def draw(self):
+    #     return f'Circle: ({self.x}, {self.y}), r={self.radius}, color={self.color}'
     def draw(self):
-        return f'Circle: ({self.x}, {self.y}), r={self.radius}, color={self.color}'
+        if not self.is_popping:
+            screen.draw.filled_circle((self.x, self.y), self.radius, self.color)
+            screen.draw.circle((self.x, self.y), self.radius, (255, 255, 255))
+            return
+
+        current_radius = int(self.radius * (1 - self.pop_progress))
+        if current_radius < 1:
+            current_radius = 1
+
+        screen.draw.filled_circle((self.x, self.y), current_radius, self.color)
 
 
 class Game:
@@ -76,8 +93,41 @@ class Game:
         for circle in self.circles:
             circle.move(self.speed_multiplier)
             
+    # def draw(self):
+    #     return self.score, [circle.draw() for circle in self.circles]
     def draw(self):
-        return self.score, [circle.draw() for circle in self.circles]
+        screen.fill(BACKGROUND_COLOR)
+
+        for circle in self.circles:
+            circle.draw()
+
+        screen.draw.text(
+            f"Счет: {self.score}",
+            topleft=(20, 20),
+            fontsize=30,
+            color=TEXT_COLOR,
+        )
+
+        screen.draw.text(
+            f"Скорость: x{self.speed_multiplier:.1f}",
+            topright=(WIDTH - 20, 20),
+            fontsize=30,
+            color=SECONDARY_TEXT_COLOR,
+        )
+
+        screen.draw.text(
+            "Нажимай левой кнопкой мыши на шарики, чтобы лопать их",
+            center=(WIDTH // 2, HEIGHT - 40),
+            fontsize=24,
+            color=HINT_TEXT_COLOR,
+        )
+
+        screen.draw.text(
+            "R - новая игра | ESC - выход",
+            center=(WIDTH // 2, HEIGHT - 15),
+            fontsize=20,
+            color=HELP_TEXT_COLOR,
+        )
     
 
 # ------------------------------------------------------------
