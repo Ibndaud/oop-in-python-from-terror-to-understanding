@@ -37,3 +37,35 @@ class Circle:
     
     def draw(self):
         return f'Circle: ({self.x}, {self.y}), r={self.radius}, color={self.color}'
+
+
+class Game:
+    _CIRCLE_NUMBER = 5
+    
+    def __init__(self):
+        self.setup_game()
+        
+    def setup_game(self):
+        self.circles = [self.spawn_circle() for _ in range(self._CIRCLE_NUMBER)]
+        self.score = 0
+        self.speed_multiplier = 1.0
+        
+    def spawn_circle(self):
+        return Circle()
+    
+    def handle_click(self, pos):
+        for circle in self.circles:
+            if circle.is_clicked(pos):
+                circle.is_popping = True
+                self.score += 1
+                self.speed_multiplier = 1 + self.score * 0.1
+                break
+                
+    def update(self):
+        self.circles = [circle if not circle.update() else self.spawn_circle() for circle in self.circles]
+        for circle in self.circles:
+            circle.move(self.speed_multiplier)
+            
+    def draw(self):
+        return self.score, [circle.draw() for circle in self.circles]
+    
