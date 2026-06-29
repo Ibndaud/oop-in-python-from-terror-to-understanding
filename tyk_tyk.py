@@ -1,3 +1,13 @@
+import pgzrun
+from random import randint, uniform
+import math
+
+
+# ------------------------------------------------------------
+# Константы (настройки игры)
+# ------------------------------------------------------------
+TITLE = "Тык-тык"
+
 WIDTH, HEIGHT = 1200, 768
 
 
@@ -69,3 +79,45 @@ class Game:
     def draw(self):
         return self.score, [circle.draw() for circle in self.circles]
     
+
+# ------------------------------------------------------------
+# Pygame Zero hooks (функции, которые вызывает движок)
+# ------------------------------------------------------------
+game = Game()
+
+
+def update():
+    """Pygame Zero вызывает эту функцию каждый кадр."""
+    game.update()
+
+
+def draw():
+    """Pygame Zero вызывает эту функцию для отрисовки кадра."""
+    game.draw()
+
+
+def on_mouse_down(pos, button):
+    """
+    Pygame Zero вызывает эту функцию при клике мышью.
+
+    pos — координаты клика (x, y)
+    button — кнопка мыши
+    """
+    if button == mouse.LEFT:
+        game.handle_click(pos)
+
+
+def on_key_down(key):
+    """
+    Pygame Zero вызывает эту функцию при нажатии клавиши.
+
+    R — перезапуск
+    ESC — выход из игры
+    """
+    if key == keys.R:
+        game.setup_game()
+    elif key == keys.ESCAPE:
+        exit()
+
+
+pgzrun.go()
