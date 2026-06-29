@@ -16,19 +16,25 @@ HELP_TEXT_COLOR = (160, 160, 180)
 
 WIDTH, HEIGHT = 1200, 768
 
+MIN_SPEED = 1.0
+MAX_SPEED = 3.0
+
+MIN_CIRCLES = 3
+MAX_CIRCLES = 7
+
 
 class Circle:
     def __init__(self):
-        self.radius = 5
-        self.color = (132, 255, 24)
-        self.x = 100
-        self.y = 150
-        self.dx = 2.0
-        self.dy = 1.5
+        self.radius = randint(15, 35)
+        self.color = (randint(100, 255), randint(100, 255), randint(100, 255))
+        self.x = randint(self.radius, WIDTH - self.radius)
+        self.y = randint(self.radius, HEIGHT - self.radius)
+        self.dx = math.cos(uniform(0, 2 * math.pi)) * uniform(MIN_SPEED, MAX_SPEED)
+        self.dy = math.sin(uniform(0, 2 * math.pi)) * uniform(MIN_SPEED, MAX_SPEED)
         self.is_popping = False
         self.pop_progress = 0.0
-        self.pop_speed = 0.2
-        
+        self.pop_speed = 0.2        
+
     def move(self, multiplier):
         if self.is_popping:
             return
@@ -39,18 +45,18 @@ class Circle:
             self.dx = -self.dx
         if self.y - self.radius < 0 or self.y + self.radius > HEIGHT:
             self.y = min(max(self.y, self.radius), HEIGHT - self.radius)
-            self.dy = -self.dy
-                
+            self.dy = -self.dy           
+
     def update(self):
         if self.is_popping:
             self.pop_progress += self.pop_speed
             return True if self.pop_progress >= 1 else False
         return False
-    
+
     def is_clicked(self, pos):
         _x, _y = pos
         return (pow(_x - self.x, 2) + pow(_y - self.y, 2)) ** 0.5 <= self.radius
-    
+
     # def draw(self):
     #     return f'Circle: ({self.x}, {self.y}), r={self.radius}, color={self.color}'
     def draw(self):
@@ -67,13 +73,13 @@ class Circle:
 
 
 class Game:
-    _CIRCLE_NUMBER = 5
+    #_CIRCLE_NUMBER = randint(MIN_CIRCLES, MAX_CIRCLES)
     
     def __init__(self):
         self.setup_game()
         
     def setup_game(self):
-        self.circles = [self.spawn_circle() for _ in range(self._CIRCLE_NUMBER)]
+        self.circles = [self.spawn_circle() for _ in range(randint(MIN_CIRCLES, MAX_CIRCLES))]
         self.score = 0
         self.speed_multiplier = 1.0
         
@@ -128,7 +134,7 @@ class Game:
             fontsize=20,
             color=HELP_TEXT_COLOR,
         )
-    
+
 
 # ------------------------------------------------------------
 # Pygame Zero hooks (функции, которые вызывает движок)
