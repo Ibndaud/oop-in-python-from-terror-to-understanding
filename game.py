@@ -1,3 +1,4 @@
+import math
 from random import randint
 from circle import Circle
 
@@ -60,6 +61,57 @@ class Game:
                 self.circles[i] = self.spawn_circle()
             else:
                 circle.move(self.speed_multiplier)
+
+        # Проверяем столкновения между кругами
+        self.circle_collision()
+
+    def circle_collision(self):
+        circles = self.circles
+        n = len(circles)
+
+        for i in range(n):
+            for j in range(i + 1, n):
+                a = circles[i]
+                b = circles[j]
+                
+                if a.is_popping or b.is_popping:
+                    continue
+
+                self.collide(a, b)
+
+    def collide(self, a, b):
+        # Вектор от центра a до центра b
+        dx = b.x - a.x
+        dy = b.y - a.y
+        distance = math.hypot(dx, dy)
+        min_distance = a.radius + b.radius
+
+        if distance >= min_distance or distance == 0:
+            return
+        
+        # --- Шаг 1: раздвигаем круги, чтобы они не перекрывались ---
+        overlap = min_distance - distance
+        # Нормализованный вектор направления (единичный вектор)
+        nx = dx / distance
+        ny = dy / distance
+
+        # Каждый круг отодвигается на половину перекрытия
+        a.x -= nx * overlap / 2
+        a.y -= ny * overlap / 2
+        b.x += nx * overlap / 2
+        b.y += ny * overlap / 2
+
+        # --- Шаг 2: обмениваем проекции скоростей на ось столкновения ---
+        # Проекция скорости a на ось nx, ny
+        a_proj = a.dx * nx + a.dy * ny
+        # Проекция скорости b на ось nx, ny
+        b_proj = b.dx * nx + b.dy * ny
+
+        # Меняем только проекции на ось столкновения (равные массы)
+        a.dx += (b_proj - a_proj) * nx
+        a.dy += (b_proj - a_proj) * ny
+        b.dx += (a_proj - b_proj) * nx
+        b.dy += (a_proj - b_proj) * ny
             
     def draw(self, screen):
         screen.fill(self.bg_color)
