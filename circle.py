@@ -58,8 +58,10 @@ class Circle:
             screen.draw.circle((self.x, self.y), self.radius, (255, 255, 255))
             return
 
-        # Анимация: круг сжимается до точки
-        current_radius = int(self.radius * (1 - self.pop_progress))
-        if current_radius < 1:
-            current_radius = 1
-        screen.draw.filled_circle((self.x, self.y), current_radius, self.color)
+        # Анимация: круг расширяется и становится прозрачнее (имитация через осветление)
+        current_radius = int(self.radius * (1 + self.pop_progress))
+        # Осветление цвета по мере исчезновения
+        fade = 1 - self.pop_progress
+        faded_color = tuple(int(color * fade) for color in self.color)
+        if current_radius >= 1:
+            screen.draw.filled_circle((self.x, self.y), current_radius, faded_color)
