@@ -48,7 +48,7 @@ class Game:
     
     def handle_click(self, pos: tuple):
         for circle in self.circles:
-            if circle.is_clicked(pos):
+            if circle.is_clicked(pos) and not circle.is_popping:
                 circle.is_popping = True
                 self.score += 1
                 self.speed_multiplier = 1 + self.score * 0.1
