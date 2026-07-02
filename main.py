@@ -74,11 +74,5 @@ def on_key_down(key):
         exit()
 
 
-def main():
-    # Primary application logic goes here
-    pgzrun.go()
-    print(f"Application Status: started...")
-
-
-if __name__ == "__main__":
-    main()
+print(f"And, here we go again...")
+pgzrun.go()

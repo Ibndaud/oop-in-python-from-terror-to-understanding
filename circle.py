@@ -1,6 +1,10 @@
 import math
 from random import randint, uniform
 
+MIN_RADIUS = 15
+MAX_RADIUS = 35
+POP_SPEED = 0.2
+
 
 class Circle:
     def __init__(self, width: int, height: int, min_speed: float, max_speed: float):
@@ -10,7 +14,7 @@ class Circle:
         self.max_speed = max_speed
 
         # Генерация параметров круга
-        self.radius = randint(15, 35)
+        self.radius = randint(MIN_RADIUS, MAX_RADIUS)
         self.color = (randint(100, 255), randint(100, 255), randint(100, 255))
         self.x = randint(self.radius, self.width - self.radius)
         self.y = randint(self.radius, self.height - self.radius)
@@ -24,7 +28,7 @@ class Circle:
         # Анимация лопания
         self.is_popping = False
         self.pop_progress = 0.0
-        self.pop_speed = 0.2        
+        self.pop_speed = POP_SPEED        
 
     def move(self, multiplier: float):
         if self.is_popping:
@@ -46,13 +50,12 @@ class Circle:
             return self.pop_progress >= 1.0
         return False
 
-    def is_clicked(self, pos: tuple) -> bool:
+    def is_clicked(self, pos: tuple[int, int]) -> bool:
         _x, _y = pos
-        # УЛУЧШЕНИЕ: math.hypot - стандартный способ вычисления расстояния
+        # math.hypot - стандартный способ вычисления расстояния
         return math.hypot(_x - self.x, _y - self.y) <= self.radius
-        # return pow(_x - self.x, 2) + pow(_y - self.y, 2) <= self.radius ** 2
 
-    def draw(self, screen):
+    def draw(self, screen) -> None:
         if not self.is_popping:
             screen.draw.filled_circle((self.x, self.y), self.radius, self.color)
             screen.draw.circle((self.x, self.y), self.radius, (255, 255, 255))
