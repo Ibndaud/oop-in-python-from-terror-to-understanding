@@ -20,6 +20,7 @@ YELLOW = (255, 255, 0)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 200, 0)
+WHITE = (255, 255, 255)
 
 SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 600
@@ -82,9 +83,14 @@ class Pipe:
 class Game:
     def __init__(self):
         pygame.init()
+
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Flappy Bird")
+
         self.clock = pygame.time.Clock()
+        self.font = pygame.font.SysFont("Arial", 25)
+        self.big_font = pygame.font.SysFont("Arial", 50)
+
         self.reset()
         
     def reset(self):
@@ -92,10 +98,32 @@ class Game:
         self.pipes = []
         self.score = 0
         self.game_over = False
+        self.start_screen = True
         self.last_pipe_spawn = pygame.time.get_ticks()
+
+    def draw_start_screen(self):
+        title = self.big_font.render("Flappy Bird", True, WHITE)
+        instruction = self.font.render("Нажмите ПРОБЕЛ для старта", True, WHITE)
+
+        self.screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 150))
+        self.screen.blit(instruction, (SCREEN_WIDTH // 2 - instruction.get_width() // 2, 300))
+
+    def draw_game_over_screen(self):
+        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        overlay.set_alpha(100)
+        overlay.fill(BLACK)
+        self.screen.blit(overlay, (0, 0))
+
+        game_over_text = self.big_font.render("GAME OVER", True, RED)
+        score_text = self.font.render(f"Ваш счёт: {self.score}", True, WHITE)
+        restart_text = self.font.render("Нажмите ПРОБЕЛ для рестарта", True, WHITE)
+
+        self.screen.blit(game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, 200))
+        self.screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 300))
+        self.screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 400))
         
     def update(self):
-        if self.game_over:
+        if self.start_screen or self.game_over:
             return
         
         self.bird.update()
@@ -127,7 +155,12 @@ class Game:
                 sys.exit()
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                self.bird.jump()
+                if self.start_screen:
+                    self.start_screen = False
+                elif not self.game_over:
+                    self.bird.jump()
+                else:
+                    self.reset()
 
     def draw(self):
         self.screen.fill(BLUE)
@@ -135,6 +168,15 @@ class Game:
 
         for pipe in self.pipes:
             pipe.draw(self.screen)
+
+        score_text = self.font.render(f"Счёт: {self.score}", True, WHITE)
+        self.screen.blit(score_text, (10, 10))
+
+        if self.start_screen:
+            self.draw_start_screen()
+
+        if self.game_over:
+            self.draw_game_over_screen()
 
         pygame.display.flip()
 
