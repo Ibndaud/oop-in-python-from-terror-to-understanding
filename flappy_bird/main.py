@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 
 
 # ------------------------------------------------------------
@@ -12,6 +13,7 @@ JUMP_VELOCITY = -10
 PIPE_WIDTH = 70
 PIPE_GAP = 200
 PIPE_VELOCITY = -3
+PIPE_SPAWN_INTERVAL = 1500
 
 BLUE = (0, 100, 255)
 YELLOW = (255, 255, 0)
@@ -29,13 +31,18 @@ class Bird:
         self.y = y
         self.velocity = 0
         self.radius = 15
+        self.rect = pygame.Rect(x - self.radius, y - self.radius, self.radius * 2, self.radius * 2)
         
     def update(self):
         self.velocity += GRAVITY
         self.y += self.velocity
+        self.rect.centery = self.y
         
     def jump(self):
         self.velocity = JUMP_VELOCITY
+
+    def get_rect(self):
+        return self.rect
         
     def draw(self, screen):
         pygame.draw.circle(screen, YELLOW, (int(self.x), int(self.y)), self.radius)
@@ -50,7 +57,7 @@ class Pipe:
         self.x = x
         self.width = PIPE_WIDTH
         self.gap = PIPE_GAP
-        self.top_height = 100
+        self.top_height = random.randint(100, SCREEN_HEIGHT - self.gap - 100)
         self.bottom_y = self.top_height + self.gap
         self.top_rect = pygame.Rect(self.x, 0, self.width, self.top_height)
         self.bottom_rect = pygame.Rect(self.x, self.bottom_y, self.width, SCREEN_HEIGHT - self.bottom_y)
@@ -68,10 +75,8 @@ class Pipe:
         pygame.draw.rect(screen, GREEN, self.top_rect)
         pygame.draw.rect(screen, GREEN, self.bottom_rect)
     
-    def collide(self, bird):
-        horizontal = bird.x + bird.radius > self.x and bird.x - bird.radius < self.x + self.width
-        vertical =  self.top_height > bird.y - bird.radius or self.bottom_y < bird.y + bird.radius
-        return horizontal and vertical
+    def collide(self, bird_rect):
+        return self.top_rect.colliderect(bird_rect) or self.bottom_rect.colliderect(bird_rect)
     
     
 class Game:
@@ -87,25 +92,50 @@ class Game:
         self.pipes = []
         self.score = 0
         self.game_over = False
+        self.last_pipe_spawn = pygame.time.get_ticks()
         
     def update(self):
+        if self.game_over:
+            return
+        
         self.bird.update()
-        for pipe in self.pipes:
+
+        if self.bird.y - self.bird.radius <= 0 or self.bird.y + self.bird.radius >= SCREEN_HEIGHT:
+            self.game_over = True
+
+        now = pygame.time.get_ticks()
+
+        if now - self.last_pipe_spawn > PIPE_SPAWN_INTERVAL:
+            self.pipes.append(Pipe(SCREEN_WIDTH))
+            self.last_pipe_spawn = now
+
+        for pipe in self.pipes[:]:
             pipe.update()
+
+            if pipe.collide(self.bird.get_rect()):
+                self.game_over = True
+            if pipe.off_screen():
+                self.pipes.remove(pipe)
+            if not pipe.passed and pipe.x + pipe.width < self.bird.x:
+                pipe.passed = True
+                self.score += 1
 
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 self.bird.jump()
 
     def draw(self):
         self.screen.fill(BLUE)
         self.bird.draw(self.screen)
+
         for pipe in self.pipes:
             pipe.draw(self.screen)
+
         pygame.display.flip()
 
     def run(self):
@@ -118,5 +148,4 @@ class Game:
 
 if __name__ == "__main__":
     game = Game()
-    game.pipes.append(Pipe(250))
     game.run()
