@@ -10,6 +10,11 @@ PIPE_WIDTH = 70
 PIPE_GAP = 200
 PIPE_VELOCITY = -4
 
+BLUE = (0, 100, 255)
+YELLOW = (255, 255, 0)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+
 SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 600
 
@@ -28,8 +33,12 @@ class Bird:
     def jump(self):
         self.velocity = JUMP_VELOCITY
         
-    def draw(self):
-        print('(•)>')
+    def draw(self, screen):
+        pygame.draw.circle(screen, YELLOW, (int(self.x), int(self.y)), self.radius)
+        pygame.draw.circle(screen, BLACK, (int(self.x) + 5, int(self.y) - 5), 3)
+        font = pygame.font.SysFont("Arial", 22)
+        beak = font.render(">", True, RED)
+        screen.blit(beak, (int(self.x) + self.radius - 2, int(self.y) - 14))
 
 
 class Pipe:
@@ -84,9 +93,15 @@ class Game:
                 pygame.quit()
                 sys.exit()
 
+    def draw(self):
+        self.screen.fill(BLUE)
+        self.bird.draw(self.screen)
+        pygame.display.flip()
+
     def run(self):
         while True:
             self.handle_events()
+            self.draw()
             self.clock.tick(FPS)
 
 
