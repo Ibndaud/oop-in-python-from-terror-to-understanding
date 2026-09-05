@@ -1,6 +1,12 @@
 GRAVITY = 0.5
 JUMP_VELOCITY = -10
 
+PIPE_WIDTH = 70
+PIPE_GAP = 200
+PIPE_VELOCITY = -4
+
+SCREEN_HEIGHT = 600
+
 class Bird:
     def __init__(self, x, y):
         self.x = x
@@ -17,3 +23,32 @@ class Bird:
         
     def draw(self):
         print('(•)>')
+
+class Pipe:
+    def __init__(self, x):
+        self.x = x
+        self.width = PIPE_WIDTH
+        self.gap = PIPE_GAP
+        self.top_height = 100
+        self.bottom_y = self.top_height + self.gap
+        self.passed = False
+        
+    def update(self):
+        self.x += PIPE_VELOCITY
+        
+    def off_screen(self):
+        return self.x + PIPE_WIDTH < 0
+    
+    def draw(self):
+        print(('###' + '\n') * (self.top_height // 20) 
+              + '\n' 
+              + ('###' + '\n') * ((SCREEN_HEIGHT - self.bottom_y) // 20 - 1) 
+              + '###')
+    
+    def collide(self, bird):
+        return (bird.x + bird.radius) > self.x and \
+    (bird.x - bird.radius) < (self.x + self.width) and \
+    (
+            self.top_height > (bird.y - bird.radius) or 
+            self.bottom_y < (bird.y + bird.radius)
+    )
