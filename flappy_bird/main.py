@@ -94,7 +94,7 @@ class Game:
         self.reset()
         
     def reset(self):
-        self.bird = Bird(100, SCREEN_HEIGHT // 2)
+        self.bird = Bird(SCREEN_WIDTH // 5, SCREEN_HEIGHT // 2 - int(SCREEN_HEIGHT * .05))
         self.pipes = []
         self.score = 0
         self.game_over = False
