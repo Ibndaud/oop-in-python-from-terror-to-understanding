@@ -7,6 +7,7 @@ PIPE_VELOCITY = -4
 
 SCREEN_HEIGHT = 600
 
+
 class Bird:
     def __init__(self, x, y):
         self.x = x
@@ -23,6 +24,7 @@ class Bird:
         
     def draw(self):
         print('(•)>')
+
 
 class Pipe:
     def __init__(self, x):
@@ -46,9 +48,24 @@ class Pipe:
               + '###')
     
     def collide(self, bird):
-        return (bird.x + bird.radius) > self.x and \
-    (bird.x - bird.radius) < (self.x + self.width) and \
-    (
-            self.top_height > (bird.y - bird.radius) or 
-            self.bottom_y < (bird.y + bird.radius)
-    )
+        horizontal = bird.x + bird.radius > self.x and bird.x - bird.radius < self.x + self.width
+        vertical =  self.top_height > bird.y - bird.radius or self.bottom_y < bird.y + bird.radius
+        return horizontal and vertical
+    
+    
+class Game:
+    def __init__(self):
+        self.reset()
+        
+        
+    def reset(self):
+        self.bird = Bird(100, SCREEN_HEIGHT // 2)
+        self.pipes = []
+        self.score = 0
+        self.game_over = False
+        
+        
+    def update(self):
+        self.bird.update()
+        for pipe in self.pipes:
+            pipe.update()
