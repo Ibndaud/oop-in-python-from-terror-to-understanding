@@ -1,4 +1,4 @@
 circles_game/build/
 circles_game/dist/
-circles_game/__pycache__/
+__pycache__/
 *.spec
