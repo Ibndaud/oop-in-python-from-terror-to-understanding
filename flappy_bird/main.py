@@ -1,6 +1,8 @@
 import pygame
+import sys
 
 
+FPS = 60
 GRAVITY = 0.5
 JUMP_VELOCITY = -10
 
@@ -62,6 +64,7 @@ class Game:
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Flappy Bird")
+        self.clock = pygame.time.Clock()
         self.reset()
         
     def reset(self):
@@ -75,8 +78,18 @@ class Game:
         for pipe in self.pipes:
             pipe.update()
 
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
-game = Game()
+    def run(self):
+        while True:
+            self.handle_events()
+            self.clock.tick(FPS)
 
-pygame.time.wait(5000)
-pygame.quit()
+
+if __name__ == "__main__":
+    game = Game()
+    game.run()
