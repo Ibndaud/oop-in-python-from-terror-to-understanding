@@ -1,3 +1,6 @@
+import pygame
+
+
 GRAVITY = 0.5
 JUMP_VELOCITY = -10
 
@@ -5,6 +8,7 @@ PIPE_WIDTH = 70
 PIPE_GAP = 200
 PIPE_VELOCITY = -4
 
+SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 600
 
 
@@ -55,8 +59,10 @@ class Pipe:
     
 class Game:
     def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption("Flappy Bird")
         self.reset()
-        
         
     def reset(self):
         self.bird = Bird(100, SCREEN_HEIGHT // 2)
@@ -64,8 +70,13 @@ class Game:
         self.score = 0
         self.game_over = False
         
-        
     def update(self):
         self.bird.update()
         for pipe in self.pipes:
             pipe.update()
+
+
+game = Game()
+
+pygame.time.wait(5000)
+pygame.quit()
