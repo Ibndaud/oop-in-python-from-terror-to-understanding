@@ -2,13 +2,16 @@ import pygame
 import sys
 
 
+# ------------------------------------------------------------
+# Константы (настройки игры)
+# ------------------------------------------------------------
 FPS = 60
 GRAVITY = 0.5
 JUMP_VELOCITY = -10
 
 PIPE_WIDTH = 70
 PIPE_GAP = 200
-PIPE_VELOCITY = -4
+PIPE_VELOCITY = -3
 
 BLUE = (0, 100, 255)
 YELLOW = (255, 255, 0)
@@ -95,6 +98,8 @@ class Game:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.bird.jump()
 
     def draw(self):
         self.screen.fill(BLUE)
@@ -106,6 +111,7 @@ class Game:
     def run(self):
         while True:
             self.handle_events()
+            self.update()
             self.draw()
             self.clock.tick(FPS)
 
