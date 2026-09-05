@@ -14,6 +14,7 @@ BLUE = (0, 100, 255)
 YELLOW = (255, 255, 0)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+GREEN = (0, 200, 0)
 
 SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 600
@@ -48,19 +49,21 @@ class Pipe:
         self.gap = PIPE_GAP
         self.top_height = 100
         self.bottom_y = self.top_height + self.gap
+        self.top_rect = pygame.Rect(self.x, 0, self.width, self.top_height)
+        self.bottom_rect = pygame.Rect(self.x, self.bottom_y, self.width, SCREEN_HEIGHT - self.bottom_y)
         self.passed = False
         
     def update(self):
         self.x += PIPE_VELOCITY
+        self.top_rect.x = self.x
+        self.bottom_rect.x = self.x
         
     def off_screen(self):
         return self.x + PIPE_WIDTH < 0
     
-    def draw(self):
-        print(('###' + '\n') * (self.top_height // 20) 
-              + '\n' 
-              + ('###' + '\n') * ((SCREEN_HEIGHT - self.bottom_y) // 20 - 1) 
-              + '###')
+    def draw(self, screen):
+        pygame.draw.rect(screen, GREEN, self.top_rect)
+        pygame.draw.rect(screen, GREEN, self.bottom_rect)
     
     def collide(self, bird):
         horizontal = bird.x + bird.radius > self.x and bird.x - bird.radius < self.x + self.width
@@ -96,6 +99,8 @@ class Game:
     def draw(self):
         self.screen.fill(BLUE)
         self.bird.draw(self.screen)
+        for pipe in self.pipes:
+            pipe.draw(self.screen)
         pygame.display.flip()
 
     def run(self):
@@ -107,4 +112,5 @@ class Game:
 
 if __name__ == "__main__":
     game = Game()
+    game.pipes.append(Pipe(250))
     game.run()
