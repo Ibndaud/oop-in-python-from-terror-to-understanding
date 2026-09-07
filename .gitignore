@@ -1,4 +1,6 @@
 circles_game/build/
 circles_game/dist/
+flappy_bird/build/
+flappy_bird/dist/
 __pycache__/
 *.spec

@@ -1,0 +1,7 @@
+[project]
+name = "oop-in-python-from-terror-to-understanding"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "pgzero>=1.2.1",
+]
