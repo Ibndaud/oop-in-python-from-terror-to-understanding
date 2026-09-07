@@ -130,6 +130,7 @@ class Game:
 
         if self.bird.y - self.bird.radius <= 0 or self.bird.y + self.bird.radius >= SCREEN_HEIGHT:
             self.game_over = True
+            return
 
         now = pygame.time.get_ticks()
 
