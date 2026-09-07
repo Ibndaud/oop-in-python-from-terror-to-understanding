@@ -33,6 +33,7 @@ class Bird:
         self.velocity = 0
         self.radius = 15
         self.rect = pygame.Rect(x - self.radius, y - self.radius, self.radius * 2, self.radius * 2)
+        self.beak = pygame.font.SysFont("Arial", 22).render(">", True, RED)
         
     def update(self):
         self.velocity += GRAVITY
@@ -48,9 +49,7 @@ class Bird:
     def draw(self, screen):
         pygame.draw.circle(screen, YELLOW, (int(self.x), int(self.y)), self.radius)
         pygame.draw.circle(screen, BLACK, (int(self.x) + 5, int(self.y) - 5), 3)
-        font = pygame.font.SysFont("Arial", 22)
-        beak = font.render(">", True, RED)
-        screen.blit(beak, (int(self.x) + self.radius - 2, int(self.y) - 14))
+        screen.blit(self.beak, (int(self.x) + self.radius - 2, int(self.y) - 14))
 
 
 class Pipe:
