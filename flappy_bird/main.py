@@ -158,6 +158,7 @@ class Game:
                 if self.start_screen:
                     self.start_screen = False
                     self.last_pipe_spawn = pygame.time.get_ticks()
+                    self.bird.jump()
                 elif not self.game_over:
                     self.bird.jump()
                 else:
