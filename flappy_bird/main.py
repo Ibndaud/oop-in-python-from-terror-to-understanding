@@ -7,12 +7,12 @@ import random
 # Константы (настройки игры)
 # ------------------------------------------------------------
 FPS = 60
-GRAVITY = 0.5
-JUMP_VELOCITY = -10
+GRAVITY = 0.5 * FPS ** 2
+JUMP_VELOCITY = -10 * FPS
 
 PIPE_WIDTH = 70
 PIPE_GAP = 200
-PIPE_VELOCITY = -3
+PIPE_VELOCITY = -3 * FPS
 PIPE_SPAWN_INTERVAL = 1500
 
 BLUE = (0, 100, 255)
@@ -35,9 +35,9 @@ class Bird:
         self.rect = pygame.Rect(x - self.radius, y - self.radius, self.radius * 2, self.radius * 2)
         self.beak = pygame.font.SysFont("Arial", 22).render(">", True, RED)
         
-    def update(self):
-        self.velocity += GRAVITY
-        self.y += self.velocity
+    def update(self, dt):
+        self.velocity += GRAVITY * dt
+        self.y += int(self.velocity * dt)
         self.rect.centery = self.y
         
     def jump(self):
@@ -63,8 +63,8 @@ class Pipe:
         self.bottom_rect = pygame.Rect(self.x, self.bottom_y, self.width, SCREEN_HEIGHT - self.bottom_y)
         self.passed = False
         
-    def update(self):
-        self.x += PIPE_VELOCITY
+    def update(self, dt):
+        self.x += int(PIPE_VELOCITY * dt)
         self.top_rect.x = self.x
         self.bottom_rect.x = self.x
         
@@ -121,11 +121,11 @@ class Game:
         self.screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 300))
         self.screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 400))
         
-    def update(self):
+    def update(self, dt):
         if self.start_screen or self.game_over:
             return
         
-        self.bird.update()
+        self.bird.update(dt)
 
         if self.bird.y - self.bird.radius <= 0 or self.bird.y + self.bird.radius >= SCREEN_HEIGHT:
             self.game_over = True
@@ -138,7 +138,7 @@ class Game:
             self.last_pipe_spawn = now
 
         for pipe in self.pipes[:]:
-            pipe.update()
+            pipe.update(dt)
 
             if pipe.collide(self.bird.get_rect()):
                 self.game_over = True
@@ -184,10 +184,11 @@ class Game:
 
     def run(self):
         while True:
+            dt = self.clock.tick(FPS) / 1000.0   # в секундах с прошлого кадра
+            dt = min(dt, 0.05)  # защита от лагов/сворачивании окна
             self.handle_events()
-            self.update()
+            self.update(dt)
             self.draw()
-            self.clock.tick(FPS)
 
 
 if __name__ == "__main__":
