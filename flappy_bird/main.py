@@ -7,12 +7,12 @@ import random
 # Константы (настройки игры)
 # ------------------------------------------------------------
 FPS = 60
-GRAVITY = 0.5 * FPS ** 2
-JUMP_VELOCITY = -10 * FPS
+GRAVITY = 0.5
+JUMP_VELOCITY = -10
 
 PIPE_WIDTH = 70
 PIPE_GAP = 200
-PIPE_VELOCITY = -3 * FPS
+PIPE_VELOCITY = -3
 PIPE_SPAWN_INTERVAL = 1500
 
 BLUE = (0, 100, 255)
@@ -32,24 +32,35 @@ class Bird:
         self.y = y
         self.velocity = 0
         self.radius = 15
+        self.angle = 0
         self.rect = pygame.Rect(x - self.radius, y - self.radius, self.radius * 2, self.radius * 2)
-        self.beak = pygame.font.SysFont("Arial", 22).render(">", True, RED)
+        self.image = pygame.Surface((50, 40), pygame.SRCALPHA) # Создаём прозрачную картинку птицы
+        pygame.draw.circle(self.image, YELLOW, (20, 20), self.radius) # Создаём тело птицы
+        pygame.draw.circle(self.image, BLACK, (25, 15), 3) # Создаём глаз птицы
+        pygame.draw.polygon(self.image, RED, [(34, 16), (48, 20), (34, 24)]) # Создаём клюв птицы
         
     def update(self, dt):
-        self.velocity += GRAVITY * dt
+        self.velocity += GRAVITY * FPS ** 2 * dt
         self.y += int(self.velocity * dt)
         self.rect.centery = self.y
-        
+
+        target_angle = max(-45, min(45, -self.velocity * 3))
+        rotation_speed = 200  # градусов в секунду
+        if self.angle < target_angle:
+            self.angle = min(self.angle + rotation_speed * dt, target_angle)
+        elif self.angle > target_angle:
+            self.angle = max(self.angle - rotation_speed * dt, target_angle)
+
     def jump(self):
-        self.velocity = JUMP_VELOCITY
+        self.velocity = JUMP_VELOCITY * FPS
 
     def get_rect(self):
         return self.rect
         
     def draw(self, screen):
-        pygame.draw.circle(screen, YELLOW, (int(self.x), int(self.y)), self.radius)
-        pygame.draw.circle(screen, BLACK, (int(self.x) + 5, int(self.y) - 5), 3)
-        screen.blit(self.beak, (int(self.x) + self.radius - 2, int(self.y) - 14))
+        rotated_image = pygame.transform.rotate(self.image, self.angle)
+        rotated_rect = rotated_image.get_rect(center=(int(self.x), int(self.y)))
+        screen.blit(rotated_image, rotated_rect)
 
 
 class Pipe:
@@ -64,7 +75,7 @@ class Pipe:
         self.passed = False
         
     def update(self, dt):
-        self.x += int(PIPE_VELOCITY * dt)
+        self.x += int(PIPE_VELOCITY * FPS * dt)
         self.top_rect.x = self.x
         self.bottom_rect.x = self.x
         
