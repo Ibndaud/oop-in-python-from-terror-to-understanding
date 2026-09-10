@@ -41,10 +41,11 @@ class Bird:
         
     def update(self, dt):
         self.velocity += GRAVITY * FPS ** 2 * dt
-        self.y += int(self.velocity * dt)
-        self.rect.centery = self.y
+        self.y += self.velocity * dt
+        # self.rect.centery = self.y
+        self.rect.center = (int(self.x), int(self.y))
 
-        target_angle = max(-45, min(45, -self.velocity * 3))
+        target_angle = max(-45, min(45, -self.velocity * .05))
         rotation_speed = 200  # градусов в секунду
         if self.angle < target_angle:
             self.angle = min(self.angle + rotation_speed * dt, target_angle)
@@ -85,9 +86,30 @@ class Pipe:
     def draw(self, screen):
         pygame.draw.rect(screen, GREEN, self.top_rect)
         pygame.draw.rect(screen, GREEN, self.bottom_rect)
-    
-    def collide(self, bird_rect):
-        return self.top_rect.colliderect(bird_rect) or self.bottom_rect.colliderect(bird_rect)
+
+    def circle_rect_collision(self, bird, rect):
+        # приближенное сравнение
+        overlap = bird.get_rect().clip(rect)
+
+        if overlap.width or overlap.height:
+            # точное сравнение
+            closest_x = max(rect.left, min(bird.x, rect.right))
+            closest_y = max(rect.top, min(bird.y, rect.bottom))
+
+            dx = bird.x - closest_x
+            dy = bird.y - closest_y
+
+            return dx ** 2 + dy ** 2 <= bird.radius ** 2
+
+        return False
+
+    def collide(self, bird):
+        # return self.top_rect.colliderect(bird_rect) or self.bottom_rect.colliderect(bird_rect)
+        return (
+            self.circle_rect_collision(bird, self.top_rect) or 
+            self.circle_rect_collision(bird, self.bottom_rect)
+            )
+
     
     
 class Game:
@@ -151,7 +173,7 @@ class Game:
         for pipe in self.pipes[:]:
             pipe.update(dt)
 
-            if pipe.collide(self.bird.get_rect()):
+            if pipe.collide(self.bird):
                 self.game_over = True
             if pipe.off_screen():
                 self.pipes.remove(pipe)
