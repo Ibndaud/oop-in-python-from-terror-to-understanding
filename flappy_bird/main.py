@@ -42,7 +42,6 @@ class Bird:
     def update(self, dt):
         self.velocity += GRAVITY * FPS ** 2 * dt
         self.y += self.velocity * dt
-        # self.rect.centery = self.y
         self.rect.center = (int(self.x), int(self.y))
 
         target_angle = max(-45, min(45, -self.velocity * .05))
@@ -104,7 +103,6 @@ class Pipe:
         return False
 
     def collide(self, bird):
-        # return self.top_rect.colliderect(bird_rect) or self.bottom_rect.colliderect(bird_rect)
         return (
             self.circle_rect_collision(bird, self.top_rect) or 
             self.circle_rect_collision(bird, self.bottom_rect)
@@ -115,6 +113,8 @@ class Pipe:
 class Game:
     def __init__(self):
         pygame.init()
+
+        self.best_score = 0
 
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Flappy Bird")
@@ -148,10 +148,12 @@ class Game:
 
         game_over_text = self.big_font.render("GAME OVER", True, RED)
         score_text = self.font.render(f"Ваш счёт: {self.score}", True, WHITE)
+        best_score_text = self.font.render(f"Ваш лучший счёт: {self.best_score}", True, WHITE)
         restart_text = self.font.render("Нажмите ПРОБЕЛ для рестарта", True, WHITE)
 
         self.screen.blit(game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, 200))
         self.screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 300))
+        self.screen.blit(best_score_text, (SCREEN_WIDTH // 2 - best_score_text.get_width() // 2, 350))
         self.screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 400))
         
     def update(self, dt):
@@ -162,6 +164,7 @@ class Game:
 
         if self.bird.y - self.bird.radius <= 0 or self.bird.y + self.bird.radius >= SCREEN_HEIGHT:
             self.game_over = True
+            self.best_score = max(self.best_score, self.score)
             return
 
         now = pygame.time.get_ticks()
@@ -175,6 +178,7 @@ class Game:
 
             if pipe.collide(self.bird):
                 self.game_over = True
+                self.best_score = max(self.best_score, self.score)
             if pipe.off_screen():
                 self.pipes.remove(pipe)
             if not pipe.passed and pipe.x + pipe.width < self.bird.x:
