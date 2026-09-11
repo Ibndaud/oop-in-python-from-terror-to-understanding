@@ -21,6 +21,7 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 200, 0)
 WHITE = (255, 255, 255)
+SKY_BLUE = (80, 180, 255)
 
 SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 600
@@ -108,8 +109,70 @@ class Pipe:
             self.circle_rect_collision(bird, self.bottom_rect)
             )
 
-    
-    
+
+class Cloud:
+    def __init__(self, x, y, speed, scale=1.0, alpha=255):
+        self.x = float(x)
+        self.y = float(y)
+        self.speed = speed
+        self.scale = scale
+
+        width = int(100 * scale)
+        height = int(50 * scale)
+
+        self.image = pygame.Surface(
+            (width, height),
+            pygame.SRCALPHA
+        )
+
+        color = (255, 255, 255, alpha)
+
+        pygame.draw.circle(
+            self.image,
+            color,
+            (int(30 * scale), int(28 * scale)),
+            int(18 * scale)
+        )
+
+        pygame.draw.circle(
+            self.image,
+            color,
+            (int(50 * scale), int(20 * scale)),
+            int(23 * scale)
+        )
+
+        pygame.draw.circle(
+            self.image,
+            color,
+            (int(72 * scale), int(30 * scale)),
+            int(16 * scale)
+        )
+
+        pygame.draw.ellipse(
+            self.image,
+            color,
+            (
+                int(20 * scale),
+                int(25 * scale),
+                int(65 * scale),
+                int(20 * scale)
+            )
+        )
+
+    def update(self, dt):
+        self.x -= self.speed * dt
+
+        if self.x + self.image.get_width() < 0:
+            self.x = SCREEN_WIDTH + random.randint(20, 150)
+            self.y = random.randint(40, 350)
+
+    def draw(self, screen):
+        screen.blit(
+            self.image,
+            (int(self.x), int(self.y))
+    )
+
+
 class Game:
     def __init__(self):
         pygame.init()
@@ -117,6 +180,22 @@ class Game:
         self.best_score = 0
 
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.background = self.create_background()
+
+        # Дальний слой облаков
+        self.far_clouds = [
+            Cloud(40, 80, 15, 0.6, 130),
+            Cloud(200, 170, 15, 0.7, 130),
+            Cloud(350, 60, 15, 0.5, 130),
+        ]
+
+        # Ближний слой облаков
+        self.near_clouds = [
+            Cloud(100, 250, 40, 1.0, 220),
+            Cloud(300, 130, 40, 1.2, 220),
+            Cloud(480, 320, 40, 0.9, 220),
+        ]
+
         pygame.display.set_caption("Flappy Bird")
 
         self.clock = pygame.time.Clock()
@@ -157,6 +236,13 @@ class Game:
         self.screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 400))
         
     def update(self, dt):
+        # Фон обновляется всегда
+        for cloud in self.far_clouds:
+            cloud.update(dt)
+
+        for cloud in self.near_clouds:
+            cloud.update(dt)
+        
         if self.start_screen or self.game_over:
             return
         
@@ -201,13 +287,79 @@ class Game:
                 else:
                     self.reset()
 
-    def draw(self):
-        self.screen.fill(BLUE)
-        self.bird.draw(self.screen)
+    def draw_sky(self):
+        top_color = (50, 150, 255)
+        bottom_color = (170, 220, 255)
 
+        for y in range(SCREEN_HEIGHT):
+            t = y / SCREEN_HEIGHT
+
+            r = int(top_color[0] * (1 - t) + bottom_color[0] * t)
+            g = int(top_color[1] * (1 - t) + bottom_color[1] * t)
+            b = int(top_color[2] * (1 - t) + bottom_color[2] * t)
+
+            pygame.draw.line(
+                self.screen,
+                (r, g, b),
+                (0, y),
+                (SCREEN_WIDTH, y)
+            )
+
+    def create_background(self):
+        surface = pygame.Surface(
+            (SCREEN_WIDTH, SCREEN_HEIGHT)
+        )
+
+        top_color = (50, 150, 255)
+        bottom_color = (170, 220, 255)
+
+        for y in range(SCREEN_HEIGHT):
+            t = y / (SCREEN_HEIGHT - 1)
+
+            r = int(
+                top_color[0]
+                + (bottom_color[0] - top_color[0]) * t
+            )
+            g = int(
+                top_color[1]
+                + (bottom_color[1] - top_color[1]) * t
+            )
+            b = int(
+                top_color[2]
+                + (bottom_color[2] - top_color[2]) * t
+            )
+
+            pygame.draw.line(
+                surface,
+                (r, g, b),
+                (0, y),
+                (SCREEN_WIDTH, y)
+            )
+
+        return surface
+
+    def draw(self):
+        # 1. Небо
+        # self.screen.fill(SKY_BLUE)
+        #self.draw_sky()
+        self.screen.blit(self.background, (0, 0))
+
+        # 2. Дальние облака
+        for cloud in self.far_clouds:
+            cloud.draw(self.screen)
+
+        # 3. Ближние облака
+        for cloud in self.near_clouds:
+            cloud.draw(self.screen)
+
+        # 4. Трубы
         for pipe in self.pipes:
             pipe.draw(self.screen)
 
+        # 5. Птица
+        self.bird.draw(self.screen)
+
+        # 6. Интерфейс
         score_text = self.font.render(f"Счёт: {self.score}", True, WHITE)
         self.screen.blit(score_text, (10, 10))
 
