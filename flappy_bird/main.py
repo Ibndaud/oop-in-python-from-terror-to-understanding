@@ -19,15 +19,15 @@ SCREEN_HEIGHT = 600
 
 if __name__ == "__main__":
     game = Game(
-        SCREEN_WIDTH, 
-        SCREEN_HEIGHT, 
-        FPS, 
-        PIPE_SPAWN_INTERVAL, 
-        GRAVITY, 
-        JUMP_VELOCITY, 
-        PIPE_WIDTH, 
-        PIPE_GAP, 
-        PIPE_VELOCITY
+        screen_width=SCREEN_WIDTH, 
+        screen_height=SCREEN_HEIGHT, 
+        fps=FPS, 
+        pipe_spawn_interval=PIPE_SPAWN_INTERVAL, 
+        gravity=GRAVITY, 
+        jump_velocity=JUMP_VELOCITY, 
+        pipe_width=PIPE_WIDTH, 
+        pipe_gap=PIPE_GAP, 
+        pipe_velocity=PIPE_VELOCITY
         )
     print("And, here we go again...")
     game.run()

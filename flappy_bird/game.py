@@ -86,7 +86,7 @@ class Game:
         game_over_text = self.big_font.render("GAME OVER", True, RED)
         score_text = self.font.render(f"Ваш счёт: {self.score}", True, WHITE)
         best_score_text = self.font.render(f"Ваш лучший счёт: {self.best_score}", True, WHITE)
-        restart_text = self.font.render("Нажмите ПРОБЕЛ для рестарта", True, WHITE)
+        restart_text = self.font.render('Нажмите "R" для рестарта', True, WHITE)
 
         self.screen.blit(game_over_text, (self.screen_width // 2 - game_over_text.get_width() // 2, 200))
         self.screen.blit(score_text, (self.screen_width // 2 - score_text.get_width() // 2, 300))
@@ -142,8 +142,9 @@ class Game:
                     self.bird.jump(self.jump_velocity, self.fps)
                 elif not self.game_over:
                     self.bird.jump(self.jump_velocity, self.fps)
-                else:
-                    self.reset()
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r and self.game_over:
+                self.reset()
 
     def draw_sky(self):
         top_color = (50, 150, 255)
