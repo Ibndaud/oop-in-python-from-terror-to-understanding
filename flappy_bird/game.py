@@ -1,13 +1,20 @@
 import pygame
 import sys
+import random
+
 from cloud import Cloud
 from bird import Bird
 from pipe import Pipe
+from utils import percent_range
 
 
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
+
+N_CLOUDS = 3 # число облаков в слое
+Y_FAR_RANGE = (7, 30) # диапазон в % для y-координат дальнего слоя облаков
+Y_NEAR_RANGE = (33, 55) # диапазон в % для y-координат ближнего слоя облаков
 
 
 class Game:
@@ -40,19 +47,47 @@ class Game:
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.background = self.create_background()
 
+        segment_width = self.screen_width // N_CLOUDS
+
         # Дальний слой облаков
+        y_min, y_max = percent_range(self.screen_height, Y_FAR_RANGE)
+
         self.far_clouds = [
-            Cloud(40, 80, 15, 0.6, 130),
-            Cloud(200, 170, 15, 0.7, 130),
-            Cloud(350, 60, 15, 0.5, 130),
-        ]
+            Cloud(
+                random.randint(
+                    i * segment_width, 
+                    (i + 1) * segment_width
+                    ),
+                random.randint(y_min, y_max), 
+                15, 
+                random.choice((0.5, 0.6, 0.7)), 
+                130, 
+                self.screen_width, 
+                self.screen_height, 
+                y_range=(y_min, y_max)
+                ) 
+                for i in range(N_CLOUDS)
+                ]
 
         # Ближний слой облаков
+        y_min, y_max = percent_range(self.screen_height, Y_NEAR_RANGE)
+        
         self.near_clouds = [
-            Cloud(100, 250, 40, 1.0, 220),
-            Cloud(300, 130, 40, 1.2, 220),
-            Cloud(480, 320, 40, 0.9, 220),
-        ]
+            Cloud(
+                random.randint(
+                    i * segment_width, 
+                    (i + 1) * segment_width
+                    ), 
+                random.randint(y_min, y_max),
+                40, 
+                random.choice((0.9, 1.0, 1.1, 1.2)), 
+                220, 
+                self.screen_width, 
+                self.screen_height, 
+                y_range=(y_min, y_max)
+                ) 
+                for i in range(N_CLOUDS)
+                ]
 
         pygame.display.set_caption("Flappy Bird")
 
@@ -63,7 +98,12 @@ class Game:
         self.reset()
         
     def reset(self):
-        self.bird = Bird(self.screen_width // 5, self.screen_height // 2 - int(self.screen_height * .05))
+        self.bird = Bird(
+            self.screen_width // 5, 
+            self.screen_height // 2 - int(self.screen_height * .05), 
+            self.gravity, 
+            self.jump_velocity
+            )
         self.pipes = []
         self.score = 0
         self.game_over = False
@@ -96,15 +136,15 @@ class Game:
     def update(self, dt):
         # Фон обновляется всегда
         for cloud in self.far_clouds:
-            cloud.update(dt, self.screen_width)
+            cloud.update(dt)
 
         for cloud in self.near_clouds:
-            cloud.update(dt, self.screen_width)
+            cloud.update(dt)
         
         if self.start_screen or self.game_over:
             return
         
-        self.bird.update(dt, self.gravity, self.fps)
+        self.bird.update(dt)
 
         if self.bird.y - self.bird.radius <= 0 or self.bird.y + self.bird.radius >= self.screen_height:
             self.game_over = True
@@ -114,17 +154,23 @@ class Game:
         now = pygame.time.get_ticks()
 
         if now - self.last_pipe_spawn > self.pipe_spawn_interval:
-            self.pipes.append(Pipe(self.screen_width, self.pipe_width, self.pipe_gap, self.screen_height))
+            self.pipes.append(
+                Pipe(self.screen_width, self.pipe_width, self.pipe_gap, self.screen_height, self.pipe_velocity)
+                )
             self.last_pipe_spawn = now
 
         for pipe in self.pipes[:]:
-            pipe.update(dt, self.pipe_velocity, self.fps)
+            pipe.update(dt)
 
             if pipe.collide(self.bird):
                 self.game_over = True
                 self.best_score = max(self.best_score, self.score)
+                return
+            
             if pipe.off_screen():
                 self.pipes.remove(pipe)
+                continue
+
             if not pipe.passed and pipe.x + pipe.width < self.bird.x:
                 pipe.passed = True
                 self.score += 1
@@ -139,25 +185,12 @@ class Game:
                 if self.start_screen:
                     self.start_screen = False
                     self.last_pipe_spawn = pygame.time.get_ticks()
-                    self.bird.jump(self.jump_velocity, self.fps)
+                    self.bird.jump()
                 elif not self.game_over:
-                    self.bird.jump(self.jump_velocity, self.fps)
+                    self.bird.jump()
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_r and self.game_over:
                 self.reset()
-
-    def draw_sky(self):
-        top_color = (50, 150, 255)
-        bottom_color = (170, 220, 255)
-
-        for y in range(self.screen_height):
-            t = y / self.screen_height
-
-            r = int(top_color[0] * (1 - t) + bottom_color[0] * t)
-            g = int(top_color[1] * (1 - t) + bottom_color[1] * t)
-            b = int(top_color[2] * (1 - t) + bottom_color[2] * t)
-
-            pygame.draw.line(self.screen, (r, g, b), (0, y), (self.screen_width, y))
 
     def create_background(self):
         surface = pygame.Surface((self.screen_width, self.screen_height))

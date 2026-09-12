@@ -7,9 +7,11 @@ RED = (255, 0, 0)
 
 
 class Bird:
-    def __init__(self, x, y):
+    def __init__(self, x, y, gravity, jump_velocity):
         self.x = x
         self.y = y
+        self.gravity = gravity
+        self.jump_velocity = jump_velocity
         self.velocity = 0
         self.radius = 15
         self.angle = 0
@@ -19,11 +21,10 @@ class Bird:
         pygame.draw.circle(self.image, BLACK, (25, 15), 3) # Создаём глаз птицы
         pygame.draw.polygon(self.image, RED, [(34, 16), (48, 20), (34, 24)]) # Создаём клюв птицы
         
-    def update(self, dt, gravity, fps):
-        self.velocity += gravity * fps ** 2 * dt
+    def update(self, dt):
+        self.velocity += self.gravity * dt
         self.y += self.velocity * dt
         self.rect.center = (int(self.x), int(self.y))
-
         target_angle = max(-45, min(45, -self.velocity * .05))
         rotation_speed = 200  # градусов в секунду
         if self.angle < target_angle:
@@ -31,8 +32,8 @@ class Bird:
         elif self.angle > target_angle:
             self.angle = max(self.angle - rotation_speed * dt, target_angle)
 
-    def jump(self, jump_velocity, fps):
-        self.velocity = jump_velocity * fps
+    def jump(self):
+        self.velocity = self.jump_velocity
 
     def get_rect(self):
         return self.rect

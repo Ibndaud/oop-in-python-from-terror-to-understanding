@@ -5,16 +5,18 @@ from game import Game
 # Константы (настройки игры)
 # ------------------------------------------------------------
 FPS = 60
-GRAVITY = 0.5
-JUMP_VELOCITY = -10
-
-PIPE_WIDTH = 70
-PIPE_GAP = 200
-PIPE_VELOCITY = -3
-PIPE_SPAWN_INTERVAL = 1500
-
 SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 600
+
+# Физика птицы
+GRAVITY = 1800 # px/s²
+JUMP_VELOCITY = -600 # px/s
+
+# Физика трубы
+PIPE_WIDTH = 70 # px
+PIPE_GAP = 200 # px
+PIPE_SPAWN_INTERVAL = 1500 # ms
+PIPE_VELOCITY = -180 # px/s
 
 
 if __name__ == "__main__":
