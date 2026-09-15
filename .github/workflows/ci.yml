@@ -27,6 +27,12 @@ jobs:
       - name: Получить код
         uses: actions/checkout@v4
 
+      # На раннере нет системного Python 3.13, а проект требует >=3.13
+      - name: Установить Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
       - name: Установить uv
         uses: astral-sh/setup-uv@v5
 
