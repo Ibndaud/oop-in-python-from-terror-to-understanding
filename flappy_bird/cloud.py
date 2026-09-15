@@ -4,11 +4,23 @@ import random
 from utils import percent_range
 
 
-X_SHIFT_RANGE = (4, 40) # диапазон в % для сдвига х-координат облаков
+X_SHIFT_RANGE = (4, 40)  # диапазон в % для сдвига х-координат облаков
 
 
 class Cloud:
-    def __init__(self, x, y, speed, scale=1.0, alpha=255, screen_width=400, screen_height=600, y_range=(7, 55)): # y_range в % от screen_height
+    """Фоновое облако: плывёт в бэкграунде влево и пересоздается за правым краем экрана."""
+
+    def __init__(
+            self, 
+            x: float, 
+            y: float, 
+            speed: float, 
+            scale: float = 1.0, 
+            alpha: int = 255, 
+            screen_width: int = 400, 
+            screen_height: int = 600, 
+            y_range: tuple[int, int] = (7, 55)
+            ) -> None: # y_range в % от screen_height
         self.x = float(x)
         self.y = float(y)
         self.speed = speed
@@ -31,12 +43,14 @@ class Cloud:
         pygame.draw.circle(self.image, color, (int(72 * scale), int(30 * scale)), int(16 * scale))
         pygame.draw.ellipse(self.image, color, (int(20 * scale), int(25 * scale), int(65 * scale), int(20 * scale)))
 
-    def update(self, dt):
+    def update(self, dt: float) -> None:
+        """Перемещает облако влево; ушедшее за край пересоздается справа."""
         self.x -= self.speed * dt
 
         if self.x + self.image.get_width() < 0:
             self.x = self.screen_width + random.randint(*self.x_shift)
             self.y = random.randint(*self.y_range)
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.Surface) -> None:
+        """Отрисовка облака."""
         screen.blit(self.image, (int(self.x), int(self.y)))

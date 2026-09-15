@@ -7,7 +7,9 @@ RED = (255, 0, 0)
 
 
 class Bird:
-    def __init__(self, x, y, gravity, jump_velocity):
+    """Птица: физика полёта, наклон по вертикальной оси, скорость движения и отрисовка."""
+
+    def __init__(self, x: float, y: float, gravity: float, jump_velocity: float) -> None:
         self.x = x
         self.y = y
         self.gravity = gravity
@@ -21,7 +23,8 @@ class Bird:
         pygame.draw.circle(self.image, BLACK, (25, 15), 3) # Создаём глаз птицы
         pygame.draw.polygon(self.image, RED, [(34, 16), (48, 20), (34, 24)]) # Создаём клюв птицы
         
-    def update(self, dt):
+    def update(self, dt: float) -> None:
+        """Считает физику кадра: скорость, позицию и плавный наклон птицы."""
         self.velocity += self.gravity * dt
         self.y += self.velocity * dt
         self.rect.center = (int(self.x), int(self.y))
@@ -32,13 +35,16 @@ class Bird:
         elif self.angle > target_angle:
             self.angle = max(self.angle - rotation_speed * dt, target_angle)
 
-    def jump(self):
+    def jump(self) -> None:
+        """Придает птице импульс движения вверх."""
         self.velocity = self.jump_velocity
 
     def get_rect(self):
+        """Возвращает хитбокс птицы — квадрат вокруг круга."""
         return self.rect
         
-    def draw(self, screen):
+    def draw(self, screen: pygame.Surface) -> None:
+        """Рисует птицу, повёрнутую на текущий угол."""
         rotated_image = pygame.transform.rotate(self.image, self.angle)
         rotated_rect = rotated_image.get_rect(center=(int(self.x), int(self.y)))
         screen.blit(rotated_image, rotated_rect)

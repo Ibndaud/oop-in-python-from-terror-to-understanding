@@ -48,6 +48,7 @@ class Game:
             )
     
     def handle_click(self, pos: tuple):
+        """Обрабатывает клик по шарику, добавляет очко и увеличивает скорость."""
         for circle in self.circles:
             if circle.is_clicked(pos) and not circle.is_popping:
                 circle.is_popping = True

@@ -1,6 +1,43 @@
-circles_game/build/
-circles_game/dist/
-flappy_bird/build/
-flappy_bird/dist/
+# --- Python ---
 __pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+*.egg
+
+# --- Виртуальные окружения ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Сборка и упаковка (PyInstaller и др.) ---
+build/
+dist/
 *.spec
+
+# --- uv ---
+# uv.lock НЕ игнорируем — фиксируем зависимости для воспроизводимости
+
+# --- Инструменты разработки: кэши ---
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# --- Окружение и секреты ---
+.env
+.env.*
+
+# --- IDE и редакторы ---
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- ОС ---
+.DS_Store
+Thumbs.db

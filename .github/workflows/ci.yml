@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  lint:
+    name: Линтинг (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Установить uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Проверить код ruff
+        run: uvx ruff check .
+
+  smoke:
+    name: Smoke-тесты (запуск модулей)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Установить uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Установить зависимости из uv.lock
+        run: uv sync
+
+      - name: Проверить синтаксис всех файлов
+        run: uv run python -m compileall circles_game flappy_bird
+
+      - name: Импортировать игровые модули (headless)
+        env:
+          SDL_VIDEODRIVER: dummy
+        run: |
+          uv run python -c "import sys; sys.path.insert(0, 'circles_game'); import circle, game"
+          uv run python -c "import sys; sys.path.insert(0, 'flappy_bird'); import bird, cloud, pipe, utils, game"

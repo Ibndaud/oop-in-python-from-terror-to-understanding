@@ -9,14 +9,14 @@ SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 600
 
 # Физика птицы
-GRAVITY = 1800 # px/s²
-JUMP_VELOCITY = -600 # px/s
+GRAVITY = 1800  # px/s²
+JUMP_VELOCITY = -600  # px/s
 
 # Физика трубы
-PIPE_WIDTH = 70 # px
-PIPE_GAP = 200 # px
-PIPE_SPAWN_INTERVAL = 1500 # ms
-PIPE_VELOCITY = -180 # px/s
+PIPE_WIDTH = 70  # px
+PIPE_GAP = 200  # px
+PIPE_SPAWN_INTERVAL = 1500  # ms
+PIPE_VELOCITY = -180  # px/s
 
 
 if __name__ == "__main__":

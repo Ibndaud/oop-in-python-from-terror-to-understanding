@@ -12,24 +12,26 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
 
-N_CLOUDS = 3 # число облаков в слое
-Y_FAR_RANGE = (7, 30) # диапазон в % для y-координат дальнего слоя облаков
-Y_NEAR_RANGE = (33, 55) # диапазон в % для y-координат ближнего слоя облаков
+N_CLOUDS = 3  # число облаков в слое
+Y_FAR_RANGE = (7, 30)  # диапазон в % для y-координат дальнего слоя облаков
+Y_NEAR_RANGE = (33, 55)  # диапазон в % для y-координат ближнего слоя облаков
 
 
 class Game:
+    """Создание игрового цикла: состояния, счёт и отрисовка объектов."""
+
     def __init__(
             self, 
-            screen_width, 
-            screen_height, 
-            fps, 
-            pipe_spawn_interval, 
-            gravity, 
-            jump_velocity, 
-            pipe_width, 
-            pipe_gap, 
-            pipe_velocity
-            ):
+            screen_width: int, 
+            screen_height: int, 
+            fps: int, 
+            pipe_spawn_interval: int, 
+            gravity: float, 
+            jump_velocity: float, 
+            pipe_width: int, 
+            pipe_gap: int, 
+            pipe_velocity: float
+            ) -> None:
         pygame.init()
 
         self.screen_width = screen_width
@@ -97,7 +99,8 @@ class Game:
 
         self.reset()
         
-    def reset(self):
+    def reset(self) -> None:
+        """Сбрасывает раунд: птица в стартовой позиции, труб нет, счет обнуляется."""
         self.bird = Bird(
             self.screen_width // 5, 
             self.screen_height // 2 - int(self.screen_height * .05), 
@@ -110,14 +113,16 @@ class Game:
         self.start_screen = True
         self.last_pipe_spawn = pygame.time.get_ticks()
 
-    def draw_start_screen(self):
+    def draw_start_screen(self) -> None:
+        """Отрисовка стартового экрана: заголовок и подсказка о старте."""
         title = self.big_font.render("Flappy Bird", True, WHITE)
         instruction = self.font.render("Нажмите ПРОБЕЛ для старта", True, WHITE)
 
         self.screen.blit(title, (self.screen_width // 2 - title.get_width() // 2, 150))
         self.screen.blit(instruction, (self.screen_width // 2 - instruction.get_width() // 2, 300))
 
-    def draw_game_over_screen(self):
+    def draw_game_over_screen(self) -> None:
+        """Отрисовка экрана проигрыша: счёт, рекорд и подсказку о рестарте игры."""
         overlay = pygame.Surface((self.screen_width, self.screen_height))
         overlay.set_alpha(100)
         overlay.fill(BLACK)
@@ -133,7 +138,8 @@ class Game:
         self.screen.blit(best_score_text, (self.screen_width // 2 - best_score_text.get_width() // 2, 350))
         self.screen.blit(restart_text, (self.screen_width // 2 - restart_text.get_width() // 2, 400))
         
-    def update(self, dt):
+    def update(self, dt: float) -> None:
+        """Шаг обновления игрового мира: облака, птица, трубы, столкновения и счёт."""
         # Фон обновляется всегда
         for cloud in self.far_clouds:
             cloud.update(dt)
@@ -175,7 +181,8 @@ class Game:
                 pipe.passed = True
                 self.score += 1
 
-    def handle_events(self):
+    def handle_events(self) -> None:
+        """Обработка событий: завершение игры, прыжок, старт и рестарт."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -192,7 +199,8 @@ class Game:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_r and self.game_over:
                 self.reset()
 
-    def create_background(self):
+    def create_background(self) -> pygame.Surface:
+        """Создание фона игры - бэкграунд с вертикальным градиентом неба."""
         surface = pygame.Surface((self.screen_width, self.screen_height))
 
         top_color = (50, 150, 255)
@@ -209,7 +217,8 @@ class Game:
 
         return surface
 
-    def draw(self):
+    def draw(self) -> None:
+        """Отрисовка кадра: небо, облака, трубы, птицу и интерфейс."""
         # 1. Небо
         self.screen.blit(self.background, (0, 0))
 
@@ -240,9 +249,10 @@ class Game:
 
         pygame.display.flip()
 
-    def run(self):
+    def run(self) -> None:
+        """Основной цикл: события -> обновление -> отрисовка, контроль ограничения кадров."""
         while True:
-            dt = self.clock.tick(self.fps) / 1000.0   # в секундах с прошлого кадра
+            dt = self.clock.tick(self.fps) / 1000.0  # в секундах с прошлого кадра
             dt = min(dt, 0.05)  # защита от лагов/сворачивании окна
             self.handle_events()
             self.update(dt)

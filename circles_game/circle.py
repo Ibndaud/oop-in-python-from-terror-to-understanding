@@ -7,6 +7,8 @@ POP_SPEED = 0.2
 
 
 class Circle:
+    """Летающий шарик: движение, отскоки от стен и анимация лопания."""
+    
     def __init__(self, width: int, height: int, min_speed: float, max_speed: float):
         self.width = width
         self.height = height

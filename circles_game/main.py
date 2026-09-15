@@ -74,5 +74,5 @@ def on_key_down(key):
         exit()
 
 
-print(f"And, here we go again...")
+print("And, here we go again...")
 pgzrun.go()
